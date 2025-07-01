@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificador Personalizable de Contenido</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container fade-in">
+        <h1>🏭 La Factoría</h1>
+        <p class="subtitle">Tu horario adaptable con guardado automático</p>
+
+        <div class="main-layout">
+            <div class="content-area">
+                <!-- Week Navigation -->
+                <div class="week-navigation">
+                    <button class="week-nav-btn" id="prevWeekBtn" onclick="navigateWeek(-1)">←</button>
+                    
+                    <div class="week-info">
+                        <div class="week-title" id="weekTitle">Semana Template</div>
+                        <div class="week-subtitle" id="weekSubtitle">Plantilla base para nuevas semanas</div>
+                    </div>
+                    
+                    <button class="week-nav-btn" id="nextWeekBtn" onclick="navigateWeek(1)">→</button>
+                    
+                    <div class="week-actions">
+                        <div class="week-hours-panel">
+                            <span class="week-hours-icon">⏱️</span>
+                            <div class="week-hours" id="weekHours">0h</div>
+                        </div>
+                        <button class="add-week-btn" onclick="createNewWeek()" title="Nueva Semana">+</button>
+                        
+                        <div class="management-dropdown" id="managementDropdown">
+                            <button class="management-btn" onclick="toggleManagementDropdown()">
+                                ⚙️ Gestión <span style="font-size: 0.7em;">▼</span>
+                            </button>
+                            <div class="management-dropdown-content">
+                                <button class="management-dropdown-item" onclick="saveAsTemplate(); toggleManagementDropdown();">💾 Guardar Template</button>
+                                <button class="management-dropdown-item" onclick="exportData(); toggleManagementDropdown();">📤 Exportar Datos</button>
+                                <button class="management-dropdown-item" onclick="importData(); toggleManagementDropdown();">📥 Importar Datos</button>
+                                <button class="management-dropdown-item" onclick="resetToDefault(); toggleManagementDropdown();">🔄 Reset Template</button>
+                                <button class="management-dropdown-item" onclick="clearAndReset(); toggleManagementDropdown();">🗑️ Limpiar Todo</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
+                        🌙
+                    </button>
+                </div>
+
+                <div class="controls">
+                    <button class="toggle-btn active" onclick="toggleView('schedule')">📅 Horario</button>
+                    <button class="toggle-btn" onclick="toggleView('publications')">📺 Publicaciones</button>
+                    <button class="toggle-btn" onclick="toggleKeyboardHelp()">⌨️ Atajos</button>
+                </div>
+
+                <div id="schedule-view">
+                    <div class="schedule-layout">
+                        <div class="schedule-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="time-col">Hora</th>
+                                        <th>LUNES<br><small>8.5h</small></th>
+                                        <th>MARTES<br><small>8.5h</small></th>
+                                        <th>MIÉRCOLES<br><small>8.5h</small></th>
+                                        <th>JUEVES<br><small>9h</small></th>
+                                        <th>VIERNES<br><small>8.5h</small></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="schedule-body">
+                                    <!-- Las filas se generarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Task Palette -->
+                        <div class="task-palette">
+                            <h3>🎨 Tareas Rápidas</h3>
+                            <div class="palette-categories" id="taskPalette">
+                                <!-- Las categorías se generarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="publications-view" style="display: none;">
+                    <div class="summary" style="margin-bottom: 30px;">
+                        <div class="summary-card">
+                            <h3>Videos YouTube</h3>
+                            <div class="value" id="youtubeCount">3</div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Reels Instagram</h3>
+                            <div class="value" id="reelsCount">3</div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Carruseles</h3>
+                            <div class="value" id="carouselsCount">1</div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Historias</h3>
+                            <div class="value" id="storiesCount">5</div>
+                        </div>
+                    </div>
+                    
+                    <div class="publications">
+                        <div class="pub-card">
+                            <h3>📺 YouTube</h3>
+                            <div class="pub-item">
+                                <span><strong>Martes 19:00</strong><br><span id="pub-video-3">Video 3 (semana anterior)</span></span>
+                                <span style="color: #e74c3c;">🔴 LIVE</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Jueves 19:00</strong><br><span id="pub-video-1">Video 1 (semana actual)</span></span>
+                                <span style="color: #e74c3c;">🔴 LIVE</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Domingo 18:00</strong><br><span id="pub-video-2">Video 2 (semana actual)</span></span>
+                                <span style="color: #e74c3c;">🔴 LIVE</span>
+                            </div>
+                        </div>
+
+                        <div class="pub-card">
+                            <h3>📱 Instagram</h3>
+                            <div class="pub-item">
+                                <span><strong>Lunes tarde</strong><br>Historias diarias</span>
+                                <span style="color: #9b59b6;">📖 Stories</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Martes tarde</strong><br>Reel 1 + Historias</span>
+                                <span style="color: #e91e63;">🎬 Reel</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Miércoles tarde</strong><br>Reel 2 + Historias</span>
+                                <span style="color: #e91e63;">🎬 Reel</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Jueves tarde</strong><br>Carrusel + Historias</span>
+                                <span style="color: #3498db;">📊 Carrusel</span>
+                            </div>
+                            <div class="pub-item">
+                                <span><strong>Viernes tarde</strong><br>Reel 3 + Historias</span>
+                                <span style="color: #e91e63;">🎬 Reel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de edición -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>✏️ Editar Tarea</h2>
+            
+            <div class="form-group">
+                <label>📝 Título:</label>
+                <input type="text" id="taskTitle" placeholder="Ej: INVESTIGACIÓN">
+            </div>
+            
+            <div class="form-group">
+                <label>📄 Descripción:</label>
+                <textarea id="taskDescription" placeholder="Ej: Buscar tema Video 1"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>😊 Icono:</label>
+                <input type="text" id="taskIcon" placeholder="🔍" maxlength="2">
+                <div class="emoji-picker">
+                    <!-- Emojis comunes -->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>🎨 Color:</label>
+                <div class="color-picker-container">
+                    <!-- Colores predefinidos -->
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-danger" onclick="deleteTask()">Eliminar</button>
+                <button class="btn btn-primary" onclick="saveTask()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear nueva semana -->
+    <div id="newWeekModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNewWeekModal()">&times;</span>
+            <h2>📅 Crear Nueva Semana</h2>
+            
+            <div class="form-group">
+                <label>📅 Fecha de inicio de la semana:</label>
+                <input type="date" id="weekStartDate">
+                <small>Se creará una nueva semana basada en el template actual</small>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeNewWeekModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="createWeekFromInputs()">Crear Semana</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input oculto para importar -->
+    <input type="file" id="importFile" accept=".json" style="display: none" onchange="handleImport()">
+
+    <!-- Modal para atajos de teclado -->
+    <div id="keyboardHelpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleKeyboardHelp()">&times;</span>
+            <h2>⌨️ Atajos de Teclado</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div>
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">🌍 Navegación Global</h3>
+                    <div style="color: #e0e0e0; line-height: 1.8;">
+                        <p><strong>← →</strong> Navegar semanas</p>
+                        <p><strong>1</strong> Vista horario</p>
+                        <p><strong>2</strong> Vista publicaciones</p>
+                        <p><strong>Ctrl+N</strong> Nueva semana</p>
+                        <p><strong>Ctrl+S</strong> Exportar datos</p>
+                        <p><strong>Ctrl+O</strong> Importar datos</p>
+                        <p><strong>Ctrl+T</strong> Guardar template</p>
+                        <p><strong>Ctrl+C</strong> Copiar tarea</p>
+                        <p><strong>Ctrl+V</strong> Pegar tarea</p>
+                        <p><strong>F1 / ?</strong> Mostrar esta ayuda</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">📝 En Celdas de Tareas</h3>
+                    <div style="color: #e0e0e0; line-height: 1.8;">
+                        <p><strong>Click izquierdo</strong> Editar tarea</p>
+                        <p><strong>Click derecho</strong> Menú contextual</p>
+                        <p><strong>Arrastrar</strong> Intercambiar tareas</p>
+                    </div>
+                    
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">📝 En Modal de Edición</h3>
+                    <div style="color: #e0e0e0; line-height: 1.8;">
+                        <p><strong>Enter</strong> Guardar cambios</p>
+                        <p><strong>Escape</strong> Cancelar</p>
+                        <p><strong>Ctrl+Del</strong> Eliminar tarea</p>
+                        <p><strong>Shift+Enter</strong> Nueva línea en descripción</p>
+                    </div>
+                    
+                    <h3 style="color: #4CAF50; margin-bottom: 15px; margin-top: 20px;">🆕 Nueva Semana</h3>
+                    <div style="color: #e0e0e0; line-height: 1.8;">
+                        <p><strong>Enter</strong> Crear</p>
+                        <p><strong>Escape</strong> Cancelar</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn btn-primary" onclick="toggleKeyboardHelp()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
